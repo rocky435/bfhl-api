@@ -1,55 +1,60 @@
 const express = require("express");
-const bodyParser = require("body-parser");
+const cors = require("cors");
 
 const app = express();
-app.use(bodyParser.json());
+app.use(cors());
+app.use(express.json());
 
-
-const FULL_NAME = "Phanindra_Kumar_Sure"; 
-const DOB = "11112004";          
+const FULL_NAME = "Phanindra_Kumar_Sure";
+const DOB = "11112004";
 const EMAIL = "rsvapk4200@gmail.com";
-const ROLL_NUMBER = "22bce20474"; 
+const ROLL_NUMBER = "22bce20474";
 
+// Health check
+app.get("/", (req, res) => {
+  res.json({ message: "BFHL API is running", endpoint: "POST /bfhl" });
+});
+
+// POST /bfhl route
 app.post("/bfhl", (req, res) => {
   try {
-    const { data } = req.body;
+    const { data } = req.body || {};
     if (!Array.isArray(data)) {
       return res.status(400).json({ is_success: false, message: "Invalid input" });
     }
 
-    // Build user_id
     const user_id = `${FULL_NAME.toLowerCase()}_${DOB}`;
-
-    let odd_numbers = [];
-    let even_numbers = [];
-    let alphabets = [];
-    let special_characters = [];
+    const odd_numbers = [];
+    const even_numbers = [];
+    const alphabets = [];
+    const special_characters = [];
     let sum = 0;
-    let letters = [];
+    const letters = [];
 
-    data.forEach(item => {
-      if (!isNaN(item) && item.trim() !== "") {
-        let num = parseInt(item);
-        if (num % 2 === 0) {
-          even_numbers.push(item);
-        } else {
-          odd_numbers.push(item);
-        }
+    data.forEach((raw) => {
+      const item = String(raw);
+
+      if (/^\d+$/.test(item)) {
+        const num = parseInt(item, 10);
         sum += num;
+        if (num % 2 === 0) even_numbers.push(item);
+        else odd_numbers.push(item);
       } else if (/^[a-zA-Z]+$/.test(item)) {
         alphabets.push(item.toUpperCase());
         letters.push(item);
-      } else {
+      } else if (item.trim() !== "") {
         special_characters.push(item);
       }
     });
 
-    // Alternating caps reverse concat string
-    let concat_string = letters.join("").split("").reverse()
-      .map((ch, idx) => idx % 2 === 0 ? ch.toUpperCase() : ch.toLowerCase())
+    const concat_string = letters
+      .join("")
+      .split("")
+      .reverse()
+      .map((ch, idx) => (idx % 2 === 0 ? ch.toUpperCase() : ch.toLowerCase()))
       .join("");
 
-    res.status(200).json({
+    return res.status(200).json({
       is_success: true,
       user_id,
       email: EMAIL,
@@ -58,14 +63,12 @@ app.post("/bfhl", (req, res) => {
       even_numbers,
       alphabets,
       special_characters,
-      sum: sum.toString(),
-      concat_string
+      sum: String(sum),
+      concat_string,
     });
   } catch (err) {
-    res.status(500).json({ is_success: false, message: err.message });
+    return res.status(500).json({ is_success: false, message: err.message });
   }
 });
 
-app.listen(3000, () => {
-  console.log("🚀 Server running on http://localhost:3000/bfhl");
-});
+module.exports = app;
