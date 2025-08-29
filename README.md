@@ -1,15 +1,38 @@
-# BFHL API (BAJAJ FINSERV HEALTH ROUND-1)
+This is a small backend API I built for my Full Stack course assignment.
+The task was to create a POST API endpoint /bfhl which takes an array as input and returns some processed output like separating odd/even numbers, alphabets, special characters, and also giving sum and a custom string.
+
+How to Run Locally:
+1)Clone the repo:
+
+git clone https://github.com/<your-username>/bfhl-api.git
+cd bfhl-api
 
 
-POST `/bfhl`
+2)Install dependencies:
 
-    <!-- Request -->
-```json
+npm install
+
+
+3)Start server:
+
+node index.js
+
+->The API will be running on:
+
+http://localhost:3000/bfhl
+
+API Details:
+
+Method: POST
+Route: /bfhl
+Content-Type: application/json
+
+Sample Request
 {
   "data": ["a", "1", "334", "4", "R", "$"]
 }
 
-//  RESPONCE
+Sample Response
 {
   "is_success": true,
   "user_id": "rahul_kumar_11112004",
@@ -22,4 +45,3 @@ POST `/bfhl`
   "sum": "339",
   "concat_string": "Ra"
 }
-
